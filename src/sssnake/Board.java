@@ -19,13 +19,10 @@ public class Board extends JPanel implements ActionListener {
 
     private final int WIDTH = 500;
     private final int HEIGHT = 500;
-    private final int KROPKA_WIELKOSC = 10;
-    private final int KROPKI = 2500;
-    private final int LOS_POZ = 30;
-    private final int DELAY = 100;
 
-    private int x[] = new int[KROPKI];
-    private int y[] = new int[KROPKI];
+
+    private int x[] = new int[2500];
+    private int y[] = new int[2500];
 
     private int kropeczki;
     private int cel_x;
@@ -46,7 +43,7 @@ public class Board extends JPanel implements ActionListener {
     public Board() {
         addKeyListener(new TAdapter());
 
-        setBackground(Color.LIGHT_GRAY);
+        setBackground(Color.GRAY);
 
         ImageIcon green = new ImageIcon(this.getClass().getResource("green.png"));
         zielona = green.getImage();
@@ -61,21 +58,30 @@ public class Board extends JPanel implements ActionListener {
         inicjalizuj();
     }
 
-
     public void inicjalizuj() {
-        kropeczki = 3;
+        kropeczki = 5;
 
         for (int i = 0; i < kropeczki; i++) {
-            x[i] = 50 - i*10;
-            y[i] = 50;
+            x[i] = 100 - i*10;
+            y[i] = 100;
         }
 
         naniesCel();
 
-        timer = new Timer(DELAY, this);
+        timer = new Timer(200, this);
         timer.start();
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (wPolu) {
+            sprawdzCel();
+            sprawdzZderzenie();
+            ruszaj();
+        }
+        repaint();
+    }
+    
     @Override
     public void paint(Graphics graph) {
         super.paint(graph);
@@ -101,14 +107,19 @@ public class Board extends JPanel implements ActionListener {
 
     public void koniecGry(Graphics g) {
         String info = "Koniec gry";
+        String info2 = "Wynik: " + (kropeczki-5);
         Font small = new Font("Arial", Font.BOLD, 20);
+        Font big = new Font("Arial", Font.BOLD, 40);
         FontMetrics metr = this.getFontMetrics(small);
 
         g.setColor(Color.black);
         g.setFont(small);
         g.drawString(info, (WIDTH - metr.stringWidth(info)) / 2, HEIGHT / 2);
+        g.setFont(big);
+        g.setColor(Color.DARK_GRAY);
+        g.drawString(info2, (WIDTH - 70 - metr.stringWidth(info2)) / 2, HEIGHT / 2+70);
     }
-
+        
     public void sprawdzCel() {
         if ((x[0] == cel_x) && (y[0] == cel_y)) {
             kropeczki++;
@@ -122,25 +133,23 @@ public class Board extends JPanel implements ActionListener {
             y[z] = y[(z - 1)];
         }
         if (left) {
-            x[0] -= KROPKA_WIELKOSC;
+            x[0] -= 10;
         }
         if (right) {
-            x[0] += KROPKA_WIELKOSC;
+            x[0] += 10;
         }
         if (up) {
-            y[0] -= KROPKA_WIELKOSC;
+            y[0] -= 10;
         }
         if (down) {
-            y[0] += KROPKA_WIELKOSC;
+            y[0] += 10;
         }
     }
 
-
     public void sprawdzZderzenie() {
         for (int z = kropeczki; z > 0; z--) {
-            if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+            if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z]))
                 wPolu = false;
-            }
         }
 
         if (y[0] > HEIGHT) {
@@ -158,22 +167,11 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void naniesCel() {
-        int r = (int) (Math.random() * LOS_POZ);
-        cel_x = ((r * KROPKA_WIELKOSC));
-        r = (int) (Math.random() * LOS_POZ);
-        cel_y = ((r * KROPKA_WIELKOSC));
+        int r = (int) (Math.random() * 50);
+        cel_x = ((r * 10));
+        r = (int) (Math.random() * 50);
+        cel_y = ((r * 10));
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (wPolu) {
-            sprawdzCel();
-            sprawdzZderzenie();
-            ruszaj();
-        }
-        repaint();
-    }
-
 
     private class TAdapter extends KeyAdapter {
 
@@ -207,4 +205,5 @@ public class Board extends JPanel implements ActionListener {
             }
         }
     }
+    
 }
